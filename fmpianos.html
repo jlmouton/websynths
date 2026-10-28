@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>80s FM Piano Synth v0.1 — Ballad Tines, Crystal Bells, Reed Piano &amp; Stereo Stack</title>
+  <meta name="description" content="Musician-friendly 6-Operator Phase-Modulation (FM) Piano synthesizer: 80s love ballad electric piano tines, cascaded crystal bells, barking reed pianos, stereo ballad stacks, soft rounded velvet pads, and sharp electric grand / clavinet.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@400;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="studio-container">
+    
+    <!-- MASTER TOP HUD -->
+    <header class="master-hud">
+      <div class="brand-section">
+        <span class="brand-icon">🎹</span>
+        <div class="brand-title">
+          <h1>80s FM PIANO SYNTH v0.1</h1>
+          <span class="brand-badge">6-Op Phase Modulation • Ballad Tines • Crystal Bells • Barking Reed • Stereo Ballad Stack</span>
+        </div>
+      </div>
+
+      <div class="hud-actions">
+        <button id="btn-audio-start-v2" class="btn-studio primary">▶ Start Audio Engine</button>
+        <button id="btn-record-v2" class="btn-studio">⏺️ Record Master WAV</button>
+        <button id="btn-midi-v2" class="btn-studio">🎹 Connect Web MIDI</button>
+        <span id="lbl-pedal-v2" class="brand-badge" style="color: var(--accent-cyan);">Pedal: OFF</span>
+
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <label for="master-volume-v2" style="font-size: 12px; color: var(--text-dim);">Vol:</label>
+          <input type="range" id="master-volume-v2" min="0" max="100" value="78" style="width: 80px; accent-color: var(--accent-cyan);">
+          <span id="volume-val-v2" style="font-family: var(--font-mono); font-size: 11px; color: var(--accent-cyan); width: 35px;">78%</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- PRESET & AUDITION BAR -->
+    <div class="preset-bar">
+      <div class="preset-controls">
+        <span style="font-size: 12px; font-weight: 700; color: var(--accent-cyan);">🎛️ Preset Bank:</span>
+        <select id="preset-select-v2" class="preset-dropdown"></select>
+        <span id="lbl-current-preset-v2" style="font-size: 12px; color: var(--accent-magenta); font-weight: 600;"></span>
+      </div>
+
+      <div class="preset-actions">
+        <button id="btn-mutate-v2" class="btn-studio" title="Mutate current FM patch by 25%">🎲 Mutate (25%)</button>
+        <button id="btn-save-a-v2" class="btn-studio" title="Store current patch to Slot A">💾 Save State A</button>
+        <button id="btn-save-b-v2" class="btn-studio" title="Audition Slot A">🔄 Recall State A</button>
+      </div>
+    </div>
+
+    <!-- 1. FULL-WIDTH 6-OPERATOR FM PIANO ENGINE (1/3 TITLE + SELECTOR, 2/3 MUSICIAN-FRIENDLY MACRO PARAMS) -->
+    <section class="rack-card" style="margin-bottom: 14px; padding: 12px;">
+      <div class="fractal-mode-grid">
+        <!-- 1/3 LEFT COLUMN: Title + 2x3 Mode Selection Grid -->
+        <div class="mode-selector-column">
+          <div class="rack-title" style="margin-bottom: 4px; font-size: 13px;">
+            <span>✨ 6-Operator FM Piano Engine</span>
+          </div>
+          <div class="mode-grid-2x3">
+            <label class="mode-tab-label">
+              <input type="radio" name="synth-mode-v2" value="dx7_epiano1" checked>
+              <span>1. Classic Tine EP</span>
+            </label>
+            <label class="mode-tab-label">
+              <input type="radio" name="synth-mode-v2" value="fm_crystal_bell">
+              <span>2. Crystal Bell</span>
+            </label>
+            <label class="mode-tab-label">
+              <input type="radio" name="synth-mode-v2" value="fm_wurli_reed">
+              <span>3. Barking Reed EP</span>
+            </label>
+            <label class="mode-tab-label">
+              <input type="radio" name="synth-mode-v2" value="fm_tx816_stack">
+              <span>4. Stereo Ballad</span>
+            </label>
+            <label class="mode-tab-label">
+              <input type="radio" name="synth-mode-v2" value="fm_lush_pad_ep">
+              <span>5. Soft Rounded EP</span>
+            </label>
+            <label class="mode-tab-label">
+              <input type="radio" name="synth-mode-v2" value="fm_perc_clav">
+              <span>6. Sharp Grand/Clav</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- 2/3 RIGHT COLUMN: Musician-Friendly FM Macro Panels (Full Height) -->
+        <div class="panel-box mode-params-box">
+        
+        <!-- Mode 1: Classic Tine Electric Piano (Algorithm 5: 3 Parallel 2-Operator Stacks) -->
+        <div id="panel-dx7_epiano1-v2" class="mode-panel-v2">
+          <div style="font-size: 11px; color: var(--text-dim); margin-bottom: 4px;">
+            💡 <em>Algorithm 5 Tine Electric Piano: Three parallel 2-operator stacks — [Op2→Op1] warm fundamental body &amp; velocity bark, [Op4(14x)→Op3] crystal 14th-harmonic tine chime, and [Op6→Op5] mechanical key click.</em>
+          </div>
+          <div style="display: grid; grid-template-columns: 150px 1fr; gap: 14px; align-items: center;">
+            <div style="position: relative;">
+              <canvas id="fm-algorithm-canvas-v2" width="145" height="90" style="border: 1px solid var(--accent-cyan); border-radius: 6px; cursor: crosshair; display: block;"></canvas>
+              <span style="position: absolute; bottom: 3px; right: 6px; font-size: 9px; color: rgba(255,255,255,0.55); pointer-events: none;">X:Chime Y:Bark</span>
+            </div>
+            <div class="knobs-grid">
+              <div class="knob-control" id="knob-tine-chime">
+                <div class="knob-svg-wrapper">
+                  <svg viewBox="0 0 52 52">
+                    <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                    <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                  </svg>
+                  <div class="knob-inner-body"></div>
+                </div>
+                <span class="knob-label">Tine Chime (14x)</span>
+                <span class="knob-val">68%</span>
+              </div>
+
+              <div class="knob-control" id="knob-fm-bark">
+                <div class="knob-svg-wrapper">
+                  <svg viewBox="0 0 52 52">
+                    <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                    <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                  </svg>
+                  <div class="knob-inner-body"></div>
+                </div>
+                <span class="knob-label">Warmth &amp; Bark</span>
+                <span class="knob-val">42%</span>
+              </div>
+
+              <div class="knob-control" id="knob-hammer-click">
+                <div class="knob-svg-wrapper">
+                  <svg viewBox="0 0 52 52">
+                    <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                    <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                  </svg>
+                  <div class="knob-inner-body"></div>
+                </div>
+                <span class="knob-label">Key Click</span>
+                <span class="knob-val">35%</span>
+              </div>
+
+              <div class="knob-control" id="knob-tine-decay">
+                <div class="knob-svg-wrapper">
+                  <svg viewBox="0 0 52 52">
+                    <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                    <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                  </svg>
+                  <div class="knob-inner-body"></div>
+                </div>
+                <span class="knob-label">Tine Decay</span>
+                <span class="knob-val">55%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mode 2: 80s Crystal Bell & Celeste (Algorithm 14 Cascaded Bell Tower) -->
+        <div id="panel-fm_crystal_bell-v2" class="mode-panel-v2 hidden">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+            <label for="bell-ratio-select-v2" style="font-size: 11px; font-weight: 600; color: var(--accent-cyan);">Bell Harmonic C:M Ratio:</label>
+            <select id="bell-ratio-select-v2" class="preset-dropdown" style="font-size: 11px; padding: 4px 8px; max-width: 260px;">
+              <option value="2.0">1 : 2.0 — Rounded Octave Bell</option>
+              <option value="3.5">1 : 3.5 — 80s Tubular Chime (Inharmonic)</option>
+              <option value="5.0">1 : 5.0 — Glassy Fifth Bell</option>
+              <option value="7.0" selected>1 : 7.0 — Diamond Celeste &amp; Music Box</option>
+              <option value="11.0">1 : 11.0 — Metallic Shimmer Bell</option>
+              <option value="14.0">1 : 14.0 — High Crystal Tine Bell</option>
+            </select>
+          </div>
+          <div class="knobs-grid">
+            <div class="knob-control" id="knob-bell-ratio">
+              <div class="knob-svg-wrapper">
+                <svg viewBox="0 0 52 52">
+                  <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                  <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                </svg>
+                <div class="knob-inner-body"></div>
+              </div>
+              <span class="knob-label">Bell Ratio</span>
+              <span class="knob-val">7.0:1</span>
+            </div>
+
+            <div class="knob-control" id="knob-bell-roundness">
+              <div class="knob-svg-wrapper">
+                <svg viewBox="0 0 52 52">
+                  <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                  <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                </svg>
+                <div class="knob-inner-body"></div>
+              </div>
+              <span class="knob-label">Roundness</span>
+              <span class="knob-val">55%</span>
+            </div>
+
+            <div class="knob-control" id="knob-cascade-shimmer">
+              <div class="knob-svg-wrapper">
+                <svg viewBox="0 0 52 52">
+                  <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                  <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                </svg>
+                <div class="knob-inner-body"></div>
+              </div>
+              <span class="knob-label">3-Op Cascade</span>
+              <span class="knob-val">48%</span>
+            </div>
+
+            <div class="knob-control" id="knob-warm-pad-mix">
+              <div class="knob-svg-wrapper">
+                <svg viewBox="0 0 52 52">
+                  <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                  <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                </svg>
+                <div class="knob-inner-body"></div>
+              </div>
+              <span class="knob-label">Warm Body</span>
+              <span class="knob-val">65%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mode 3: Barking Reed Electric Piano (Algorithm 4) -->
+        <div id="panel-fm_wurli_reed-v2" class="mode-panel-v2 hidden">
+          <div style="font-size: 11px; color: var(--text-dim); margin-bottom: 4px;">
+            💡 <em>Algorithm 4 Reed Piano Model: Uses 2:1 and 3:1 modulator ratios into a 1:1 carrier to create asymmetric odd-harmonic reed growl and stereo vibrato.</em>
+          </div>
+          <div class="knobs-grid">
+            <div class="knob-control" id="knob-reed-bite">
+              <div class="knob-svg-wrapper">
+                <svg viewBox="0 0 52 52">
+                  <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                  <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                </svg>
+                <div class="knob-inner-body"></div>
+              </div>
+              <span class="knob-label">Reed Bite</span>
+              <span class="knob-val">62%</span>
+            </div>
+
+            <div class="knob-control" id="knob-reed-buzz">
+              <div class="knob-svg-wrapper">
+                <svg viewBox="0 0 52 52">
+                  <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                  <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                </svg>
+                <div class="knob-inner-body"></div>
+              </div>
+              <span class="knob-label">Op 6 Feedback</span>
+              <span class="knob-val">45%</span>
+            </div>
+
+            <div class="knob-control" id="knob-tremolo-depth">
+              <div class="knob-svg-wrapper">
+                <svg viewBox="0 0 52 52">
+                  <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                  <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                </svg>
+                <div class="knob-inner-body"></div>
+              </div>
+              <span class="knob-label">Reed Vibrato</span>
+              <span class="knob-val">40%</span>
+            </div>
+
+            <div class="knob-control" id="knob-wood-body">
+              <div class="knob-svg-wrapper">
+                <svg viewBox="0 0 52 52">
+                  <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                  <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                </svg>
+                <div class="knob-inner-body"></div>
+              </div>
+              <span class="knob-label">Wood Cabinet</span>
+              <span class="knob-val">65%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mode 4: Stereo Ballad Stack (80s Love Ballad) -->
+        <div id="panel-fm_tx816_stack-v2" class="mode-panel-v2 hidden">
+          <div style="font-size: 11px; color: var(--text-dim); margin-bottom: 4px;">
+            💡 <em>1980s Studio Multi-Rack Stereo Stack: Combines detuned FM modules in wide stereo — warm electric piano body + glassy 7x &amp; 14x dual tines + acoustic-electric hammer snap.</em>
+          </div>
+          <div class="knobs-grid">
+            <div class="knob-control" id="knob-stack-spread">
+              <div class="knob-svg-wrapper">
+                <svg viewBox="0 0 52 52">
+                  <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                  <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                </svg>
+                <div class="knob-inner-body"></div>
+              </div>
+              <span class="knob-label">Stereo Spread</span>
+              <span class="knob-val">80%</span>
+            </div>
+
+            <div class="knob-control" id="knob-foster-glass">
+              <div class="knob-svg-wrapper">
+                <svg viewBox="0 0 52 52">
+                  <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                  <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                </svg>
+                <div class="knob-inner-body"></div>
+              </div>
+              <span class="knob-label">Glassy Tines</span>
+              <span class="knob-val">75%</span>
+            </div>
+
+            <div class="knob-control" id="knob-ballad-warmth">
+              <div class="knob-svg-wrapper">
+                <svg viewBox="0 0 52 52">
+                  <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                  <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                </svg>
+                <div class="knob-inner-body"></div>
+              </div>
+              <span class="knob-label">Ballad Warmth</span>
+              <span class="knob-val">80%</span>
+            </div>
+
+            <div class="knob-control" id="knob-attack-snap">
+              <div class="knob-svg-wrapper">
+                <svg viewBox="0 0 52 52">
+                  <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                  <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                </svg>
+                <div class="knob-inner-body"></div>
+              </div>
+              <span class="knob-label">Hammer Snap</span>
+              <span class="knob-val">50%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mode 5: Soft Rounded Ballad EP & Dream Pad (Algorithm 16) -->
+        <div id="panel-fm_lush_pad_ep-v2" class="mode-panel-v2 hidden">
+          <div style="font-size: 11px; color: var(--text-dim); margin-bottom: 4px;">
+            💡 <em>Algorithm 16 Velvet Ballad EP: Multiple modulators converge into a soft, rounded carrier where bell overtones gently blossom after the key strike.</em>
+          </div>
+          <div class="knobs-grid">
+            <div class="knob-control" id="knob-tone-softness">
+              <div class="knob-svg-wrapper">
+                <svg viewBox="0 0 52 52">
+                  <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                  <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                </svg>
+                <div class="knob-inner-body"></div>
+              </div>
+              <span class="knob-label">Tone Softness</span>
+              <span class="knob-val">75%</span>
+            </div>
+
+            <div class="knob-control" id="knob-bell-bloom">
+              <div class="knob-svg-wrapper">
+                <svg viewBox="0 0 52 52">
+                  <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                  <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                </svg>
+                <div class="knob-inner-body"></div>
+              </div>
+              <span class="knob-label">Bell Bloom</span>
+              <span class="knob-val">60%</span>
+            </div>
+
+            <div class="knob-control" id="knob-sub-warmth">
+              <div class="knob-svg-wrapper">
+                <svg viewBox="0 0 52 52">
+                  <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                  <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                </svg>
+                <div class="knob-inner-body"></div>
+              </div>
+              <span class="knob-label">Velvet Sub</span>
+              <span class="knob-val">70%</span>
+            </div>
+
+            <div class="knob-control" id="knob-air-halo">
+              <div class="knob-svg-wrapper">
+                <svg viewBox="0 0 52 52">
+                  <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                  <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                </svg>
+                <div class="knob-inner-body"></div>
+              </div>
+              <span class="knob-label">Air Halo</span>
+              <span class="knob-val">52%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mode 6: Sharp-Attack Electric Grand, FM Clav & Hollow Mallet (Algorithm 7) -->
+        <div id="panel-fm_perc_clav-v2" class="mode-panel-v2 hidden">
+          <div style="font-size: 11px; color: var(--text-dim); margin-bottom: 4px;">
+            💡 <em>Algorithm 7 Sharp Percussive Keyboards: Sculpt snappy Electric Grand piano strings, funky 3:1 hollow FM Clavinet picks, or woody 4:1 rosewood mallets.</em>
+          </div>
+          <div class="knobs-grid">
+            <div class="knob-control" id="knob-attack-sharpness">
+              <div class="knob-svg-wrapper">
+                <svg viewBox="0 0 52 52">
+                  <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                  <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                </svg>
+                <div class="knob-inner-body"></div>
+              </div>
+              <span class="knob-label">Strike Bite</span>
+              <span class="knob-val">75%</span>
+            </div>
+
+            <div class="knob-control" id="knob-hollow-ratio">
+              <div class="knob-svg-wrapper">
+                <svg viewBox="0 0 52 52">
+                  <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                  <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                </svg>
+                <div class="knob-inner-body"></div>
+              </div>
+              <span class="knob-label">Hollow Ratio</span>
+              <span class="knob-val">3.0:1</span>
+            </div>
+
+            <div class="knob-control" id="knob-string-brilliance">
+              <div class="knob-svg-wrapper">
+                <svg viewBox="0 0 52 52">
+                  <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                  <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                </svg>
+                <div class="knob-inner-body"></div>
+              </div>
+              <span class="knob-label">Brilliance</span>
+              <span class="knob-val">60%</span>
+            </div>
+
+            <div class="knob-control" id="knob-damper-tightness">
+              <div class="knob-svg-wrapper">
+                <svg viewBox="0 0 52 52">
+                  <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                  <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                </svg>
+                <div class="knob-inner-body"></div>
+              </div>
+              <span class="knob-label">Damper Snap</span>
+              <span class="knob-val">60%</span>
+            </div>
+          </div>
+        </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. MAIN TWO-COLUMN STUDIO WORKSPACE GRID -->
+    <main class="studio-grid">
+      
+      <!-- LEFT COLUMN: ADSR Envelope & Super-Unison / Sub-Bass -->
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        
+        <!-- ADSR AMPLITUDE ENVELOPE GENERATOR -->
+        <section class="rack-card">
+          <div class="rack-header">
+            <div class="rack-title">
+              <span>📈 ADSR Amplitude Envelope Generator</span>
+            </div>
+          </div>
+
+          <div class="adsr-layout-row">
+            <!-- Left: 4 Knobs (Attack, Decay, Sustain, Release) -->
+            <div class="knobs-grid adsr-knobs-grid">
+              <div class="knob-control" id="knob-adsr-attack">
+                <div class="knob-svg-wrapper">
+                  <svg viewBox="0 0 52 52">
+                    <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                    <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                  </svg>
+                  <div class="knob-inner-body"></div>
+                </div>
+                <span class="knob-label">Attack</span>
+                <span class="knob-val">3 ms</span>
+              </div>
+
+              <div class="knob-control" id="knob-adsr-decay">
+                <div class="knob-svg-wrapper">
+                  <svg viewBox="0 0 52 52">
+                    <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                    <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                  </svg>
+                  <div class="knob-inner-body"></div>
+                </div>
+                <span class="knob-label">Decay</span>
+                <span class="knob-val">1.35s</span>
+              </div>
+
+              <div class="knob-control" id="knob-adsr-sustain">
+                <div class="knob-svg-wrapper">
+                  <svg viewBox="0 0 52 52">
+                    <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                    <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                  </svg>
+                  <div class="knob-inner-body"></div>
+                </div>
+                <span class="knob-label">Sustain</span>
+                <span class="knob-val">32%</span>
+              </div>
+
+              <div class="knob-control" id="knob-adsr-release">
+                <div class="knob-svg-wrapper">
+                  <svg viewBox="0 0 52 52">
+                    <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                    <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                  </svg>
+                  <div class="knob-inner-body"></div>
+                </div>
+                <span class="knob-label">Release</span>
+                <span class="knob-val">850 ms</span>
+              </div>
+            </div>
+
+            <!-- Right: Graphical Representation of ADSR Envelope -->
+            <div class="adsr-canvas-wrapper">
+              <canvas id="adsr-canvas-v2" width="220" height="80"></canvas>
+            </div>
+          </div>
+        </section>
+
+        <!-- UNISON DETUNE STACK & SUB-BASS GENERATOR -->
+        <section class="rack-card">
+          <div class="rack-header">
+            <div class="rack-title">
+              <span>🔊 Super-Unison Stack &amp; Sub-Bass Core</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <select id="sub-wave-select-v2" class="mini-select" title="Sub-Bass Waveform">
+                <option value="sine">Sub: Sine</option>
+                <option value="triangle">Sub: Tri</option>
+                <option value="square">Sub: Square</option>
+              </select>
+              <select id="sub-octave-select-v2" class="mini-select" title="Sub-Bass Octave Offset">
+                <option value="12">-1 Oct (12st)</option>
+                <option value="24">-2 Oct (24st)</option>
+              </select>
+              <label class="switch" title="Toggle Super-Unison & Sub">
+                <input type="checkbox" id="toggle-unison-v2">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="knobs-grid">
+            <div class="knob-control" id="knob-unison-voices">
+              <div class="knob-svg-wrapper">
+                <svg viewBox="0 0 52 52">
+                  <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                  <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                </svg>
+                <div class="knob-inner-body"></div>
+              </div>
+              <span class="knob-label">Stack Voices</span>
+              <span class="knob-val">3</span>
+            </div>
+
+            <div class="knob-control" id="knob-unison-detune">
+              <div class="knob-svg-wrapper">
+                <svg viewBox="0 0 52 52">
+                  <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                  <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                </svg>
+                <div class="knob-inner-body"></div>
+              </div>
+              <span class="knob-label">Detune Cents</span>
+              <span class="knob-val">7 ct</span>
+            </div>
+
+            <div class="knob-control" id="knob-unison-stereo">
+              <div class="knob-svg-wrapper">
+                <svg viewBox="0 0 52 52">
+                  <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                  <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                </svg>
+                <div class="knob-inner-body"></div>
+              </div>
+              <span class="knob-label">Stereo Width</span>
+              <span class="knob-val">70%</span>
+            </div>
+
+            <div class="knob-control" id="knob-sub-level">
+              <div class="knob-svg-wrapper">
+                <svg viewBox="0 0 52 52">
+                  <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                  <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                </svg>
+                <div class="knob-inner-body"></div>
+              </div>
+              <span class="knob-label">Sub-Bass Vol</span>
+              <span class="knob-val">0%</span>
+            </div>
+
+            <div class="knob-control" id="knob-glide-time">
+              <div class="knob-svg-wrapper">
+                <svg viewBox="0 0 52 52">
+                  <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                  <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                </svg>
+                <div class="knob-inner-body"></div>
+              </div>
+              <span class="knob-label">Portamento</span>
+              <span class="knob-val">0 ms</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- MULTI-DESTINATION MODULATION LFO -->
+        <section class="rack-card">
+          <div class="rack-header">
+            <div class="rack-title">
+              <span>🌊 Multi-Destination Modulation LFO</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <select id="lfo-shape-select-v2" class="mini-select" title="LFO Waveform Shape">
+                <option value="sine">Shape: Sine</option>
+                <option value="triangle">Shape: Tri</option>
+                <option value="sawtooth">Shape: Saw</option>
+                <option value="square">Shape: Square</option>
+                <option value="fbm">Shape: Fractal fBm</option>
+              </select>
+              <select id="lfo-target-select-v2" class="mini-select" title="LFO Target Destination">
+                <option value="none">Dest: None</option>
+                <option value="cutoff" selected>Dest: Filter Cutoff</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="knobs-grid">
+            <div class="knob-control" id="knob-lfo-rate">
+              <div class="knob-svg-wrapper">
+                <svg viewBox="0 0 52 52">
+                  <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                  <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                </svg>
+                <div class="knob-inner-body"></div>
+              </div>
+              <span class="knob-label">LFO Rate</span>
+              <span class="knob-val">0.85 Hz</span>
+            </div>
+
+            <div class="knob-control" id="knob-lfo-depth">
+              <div class="knob-svg-wrapper">
+                <svg viewBox="0 0 52 52">
+                  <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                  <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                </svg>
+                <div class="knob-inner-body"></div>
+              </div>
+              <span class="knob-label">Mod Depth</span>
+              <span class="knob-val">8%</span>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- RIGHT COLUMN: MULTI-MODAL VISUALIZER & ARPEGGIATOR -->
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        
+        <!-- MULTI-MODAL VISUALIZER SUITE (FULL HEIGHT STRETCH) -->
+        <section class="visualizer-card">
+          <div class="rack-header">
+            <div class="rack-title">
+              <span>📊 Real-Time Visualizer Suite</span>
+            </div>
+            
+            <div class="viz-nav-tabs">
+              <button class="viz-tab-btn active" data-viz="attractor3d">3D FM Sidebands</button>
+              <button class="viz-tab-btn" data-viz="spectrogram">FFT Waterfall</button>
+              <button class="viz-tab-btn" data-viz="goniometer">Vector Scope</button>
+              <button class="viz-tab-btn" data-viz="harmonics">Partials</button>
+              <button class="viz-tab-btn" data-viz="scope">Waveform</button>
+            </div>
+          </div>
+
+          <div class="main-visualizer-box">
+            <canvas id="main-visualizer-canvas" width="600" height="280"></canvas>
+          </div>
+        </section>
+
+        <!-- GENERATIVE FRACTAL ARPEGGIATOR & SEQUENCER -->
+        <section class="rack-card">
+          <div class="rack-header">
+            <div class="rack-title">
+              <span>⚡ Generative Fractal Arpeggiator</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <select id="arp-mode-select-v2" class="mini-select" title="Arpeggiator Mode">
+                <option value="up">Arp: Up</option>
+                <option value="down">Arp: Down</option>
+                <option value="updown" selected>Arp: Up/Down</option>
+                <option value="random">Arp: Random</option>
+                <option value="euclidean">Arp: Euclidean E(5,8)</option>
+                <option value="fibonacci">Arp: Fibonacci</option>
+                <option value="thue_morse">Arp: Thue-Morse</option>
+              </select>
+              <label class="switch" title="Toggle Arpeggiator">
+                <input type="checkbox" id="toggle-arp-v2">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="knobs-grid">
+            <div class="knob-control" id="knob-arp-bpm">
+              <div class="knob-svg-wrapper">
+                <svg viewBox="0 0 52 52">
+                  <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                  <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                </svg>
+                <div class="knob-inner-body"></div>
+              </div>
+              <span class="knob-label">Tempo (BPM)</span>
+              <span class="knob-val">120</span>
+            </div>
+
+            <div class="knob-control" id="knob-arp-octaves">
+              <div class="knob-svg-wrapper">
+                <svg viewBox="0 0 52 52">
+                  <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                  <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                </svg>
+                <div class="knob-inner-body"></div>
+              </div>
+              <span class="knob-label">Octaves</span>
+              <span class="knob-val">2</span>
+            </div>
+
+            <div class="knob-control" id="knob-arp-gate">
+              <div class="knob-svg-wrapper">
+                <svg viewBox="0 0 52 52">
+                  <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                  <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                </svg>
+                <div class="knob-inner-body"></div>
+              </div>
+              <span class="knob-label">Gate Length</span>
+              <span class="knob-val">80%</span>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+    </main>
+
+    <!-- STUDIO AUDIO FX RACK -->
+    <section class="rack-card">
+      <div class="rack-header">
+        <div class="rack-title">
+          <span>🎛️ Studio Audio Effects Pipeline (Filter ➔ Wavefolder ➔ Chorus ➔ Delay ➔ FDN Reverb ➔ Limiter)</span>
+        </div>
+        <label class="switch" title="Toggle Studio Audio Effects Pipeline">
+          <input type="checkbox" id="toggle-fx-master-v2" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="fx-rack-grid">
+        <!-- 1. Filter -->
+        <div class="fx-module knobs-2">
+          <div class="fx-header">
+            <span class="fx-title">🎚️ Multi-Mode Filter</span>
+            <select id="filter-type-select-v2" class="mini-select" title="Filter Response Curve">
+              <option value="lowpass" selected>Lowpass 24dB</option>
+              <option value="highpass">Highpass 24dB</option>
+              <option value="bandpass">Bandpass</option>
+              <option value="notch">Notch / Reject</option>
+            </select>
+          </div>
+          <div class="knobs-grid">
+            <div class="knob-control" id="knob-filter-cutoff">
+              <div class="knob-svg-wrapper">
+                <svg viewBox="0 0 52 52">
+                  <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                  <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                </svg>
+                <div class="knob-inner-body"></div>
+              </div>
+              <span class="knob-label">Cutoff</span>
+              <span class="knob-val">11500 Hz</span>
+            </div>
+            <div class="knob-control" id="knob-filter-res">
+              <div class="knob-svg-wrapper">
+                <svg viewBox="0 0 52 52">
+                  <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                  <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                </svg>
+                <div class="knob-inner-body"></div>
+              </div>
+              <span class="knob-label">Resonance</span>
+              <span class="knob-val">1.0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Wavefolder / Drive -->
+        <div class="fx-module knobs-1">
+          <div class="fx-header">
+            <span class="fx-title">🔥 Wavefolder</span>
+          </div>
+          <div class="knobs-grid">
+            <div class="knob-control" id="knob-fx-drive">
+              <div class="knob-svg-wrapper">
+                <svg viewBox="0 0 52 52">
+                  <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                  <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                </svg>
+                <div class="knob-inner-body"></div>
+              </div>
+              <span class="knob-label">Fold / Sat</span>
+              <span class="knob-val">0%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Stereo Chorus -->
+        <div class="fx-module knobs-1">
+          <div class="fx-header">
+            <span class="fx-title">✨ Vector Chorus</span>
+          </div>
+          <div class="knobs-grid">
+            <div class="knob-control" id="knob-fx-chorus-mix">
+              <div class="knob-svg-wrapper">
+                <svg viewBox="0 0 52 52">
+                  <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                  <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                </svg>
+                <div class="knob-inner-body"></div>
+              </div>
+              <span class="knob-label">Mix</span>
+              <span class="knob-val">0%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Ping-Pong Delay -->
+        <div class="fx-module knobs-3">
+          <div class="fx-header">
+            <span class="fx-title">🔁 Ping-Pong Echo</span>
+          </div>
+          <div class="knobs-grid">
+            <div class="knob-control" id="knob-fx-delay-mix">
+              <div class="knob-svg-wrapper">
+                <svg viewBox="0 0 52 52">
+                  <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                  <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                </svg>
+                <div class="knob-inner-body"></div>
+              </div>
+              <span class="knob-label">Mix</span>
+              <span class="knob-val">10%</span>
+            </div>
+            <div class="knob-control" id="knob-fx-delay-time">
+              <div class="knob-svg-wrapper">
+                <svg viewBox="0 0 52 52">
+                  <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                  <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                </svg>
+                <div class="knob-inner-body"></div>
+              </div>
+              <span class="knob-label">Time</span>
+              <span class="knob-val">360 ms</span>
+            </div>
+            <div class="knob-control" id="knob-fx-delay-feedback">
+              <div class="knob-svg-wrapper">
+                <svg viewBox="0 0 52 52">
+                  <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                  <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                </svg>
+                <div class="knob-inner-body"></div>
+              </div>
+              <span class="knob-label">Feedback</span>
+              <span class="knob-val">28%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. FDN Reverb -->
+        <div class="fx-module knobs-2">
+          <div class="fx-header">
+            <span class="fx-title">🌊 FDN Diffusion Reverb</span>
+          </div>
+          <div class="knobs-grid">
+            <div class="knob-control" id="knob-fx-reverb-mix">
+              <div class="knob-svg-wrapper">
+                <svg viewBox="0 0 52 52">
+                  <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                  <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                </svg>
+                <div class="knob-inner-body"></div>
+              </div>
+              <span class="knob-label">Mix</span>
+              <span class="knob-val">34%</span>
+            </div>
+            <div class="knob-control" id="knob-fx-reverb-size">
+              <div class="knob-svg-wrapper">
+                <svg viewBox="0 0 52 52">
+                  <circle class="knob-track" cx="26" cy="26" r="20"></circle>
+                  <circle class="knob-progress" cx="26" cy="26" r="20"></circle>
+                </svg>
+                <div class="knob-inner-body"></div>
+              </div>
+              <span class="knob-label">Space</span>
+              <span class="knob-val">2.8s</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- INTERACTIVE 2-OCTAVE PIANO KEYBOARD -->
+    <section class="keyboard-section">
+      <div class="rack-header">
+        <div class="rack-title">
+          <span>🎹 2-Octave Touch &amp; QWERTY Keyboard</span>
+          <span style="font-size: 11px; color: var(--text-dim); font-weight: normal;">(Lower: Z-X-C... • Upper: Q-W-E...)</span>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <button id="btn-oct-down-v2" class="btn-studio">◄ Oct -</button>
+          <span id="lbl-octave-v2" style="font-family: var(--font-mono); font-size: 12px; color: var(--accent-cyan); min-width: 75px; text-align: center;">Octave: C3</span>
+          <button id="btn-oct-up-v2" class="btn-studio">Oct + ►</button>
+        </div>
+      </div>
+
+      <div id="piano-keyboard-v2" class="piano-container-v2"></div>
+    </section>
+
+  </div>
+
+  <!-- LOAD MODULAR SCRIPTS IN PROPER ORDER (UMD / Global Namespace compatible with file:// & HTTP) -->
+  <!-- 1. Web Synthesizer Framework Core & AudioBus -->
+  <script data-cfasync="false" src="framework/math-scales.js"></script>
+  <script data-cfasync="false" src="framework/audio-bus.js"></script>
+  <script data-cfasync="false" src="framework/ui-controls.js"></script>
+  <script data-cfasync="false" src="framework/keyboard.js"></script>
+  <script data-cfasync="false" src="framework/midi.js"></script>
+  <script data-cfasync="false" src="framework/recorder.js"></script>
+  <script data-cfasync="false" src="framework/preset-manager.js"></script>
+
+  <!-- 2. DX7 & Dexed 6-Operator Phase-Modulation Piano Engines (6 Modes) -->
+  <script data-cfasync="false" src="synths/fmpianos/engines/dx7-epiano1.js"></script>
+  <script data-cfasync="false" src="synths/fmpianos/engines/fm-crystal-bell.js"></script>
+  <script data-cfasync="false" src="synths/fmpianos/engines/fm-wurli-reed.js"></script>
+  <script data-cfasync="false" src="synths/fmpianos/engines/fm-tx816-stack.js"></script>
+  <script data-cfasync="false" src="synths/fmpianos/engines/fm-lush-pad-ep.js"></script>
+  <script data-cfasync="false" src="synths/fmpianos/engines/fm-perc-clav.js"></script>
+
+  <!-- 3. Per-Voice & Modulation Modules (Envelope, Detune/Unison, LFO, Arpeggiator) -->
+  <script data-cfasync="false" src="modules/envelope.js"></script>
+  <script data-cfasync="false" src="modules/detune.js"></script>
+  <script data-cfasync="false" src="modules/lfo.js"></script>
+  <script data-cfasync="false" src="modules/arpeggiator.js"></script>
+
+  <!-- 4. Studio Audio Effects Rack -->
+  <script data-cfasync="false" src="effects/filter.js"></script>
+  <script data-cfasync="false" src="effects/wavefolder.js"></script>
+  <script data-cfasync="false" src="effects/chorus.js"></script>
+  <script data-cfasync="false" src="effects/delay.js"></script>
+  <script data-cfasync="false" src="effects/reverb.js"></script>
+  <script data-cfasync="false" src="effects/limiter.js"></script>
+  <script data-cfasync="false" src="effects/fx-engine.js"></script>
+
+  <!-- 5. Real-Time Visualization Suite -->
+  <script data-cfasync="false" src="visualizers/visualizer-suite.js"></script>
+
+  <!-- 6. Framework Voice Allocator, Coordinator, Factory Presets & App Bootstrap -->
+  <script data-cfasync="false" src="framework/voice-manager.js"></script>
+  <script data-cfasync="false" src="framework/synth-framework.js"></script>
+  <script data-cfasync="false" src="synths/fmpianos/presets.js"></script>
+  <script data-cfasync="false" src="synths/fmpianos/app.js"></script>
+</body>
+</html>
