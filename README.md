@@ -8,11 +8,11 @@ A modular, browser-based sound synthesis workstation built with modern JavaScrip
 
 Each synthesizer runs as a standalone web application and has its own dedicated deep-dive documentation covering explanations for everyday listeners, sound designers, and DSP mathematicians:
 
-| Synthesizer | Entry Point | Documentation | Description |
+| Synthesizer | Entry Point | Playable Synth | Documentation | Description |
 | :--- | :--- | :--- | :--- |
-| **80s FM Piano Synth v0.1** | [`fmpianos.html`](fmpianos.html) | [**`README-fmpianos.md`**](README-fmpianos.md) | Musician-friendly 6-Operator Phase Modulation (FM) piano engine capturing the iconic crystalline electric pianos, bell chimes, barking reeds, and lush ballad stacks of the 1980s. |
-| **Fractal Sound Engine V2** | [`fractalsynths.html`](fractalsynths.html) | [**`README-fractal.md`**](README-fractal.md) | Polyphonic synthesizer driven by mathematical fractals, strange attractor chaos theory (Lorenz, Rössler, Chua), optical image resynthesis, and Wolfram 1D cellular automata. |
-| **Physical Modeling String Synthesizer v0.1** | [`stringphysicalmodeling.html`](stringphysicalmodeling.html) | [**`README-stringphysicalmodeling.md`**](README-stringphysicalmodeling.md) | Acoustic string acoustics engine modeling plucked waveguides, tapped/struck hammers, bowed violin stick-slip friction, flageolet nodes, sympathetic arrays, and dispersive stiff wires. |
+| **80s FM Piano Synth v0.1** | [`fmpianos.html`](fmpianos.html) | [https://atuetete.com/web-synthesizers/unified/fmpianos.html](Play here) | [**`README-fmpianos.md`**](README-fmpianos.md) | Musician-friendly 6-Operator Phase Modulation (FM) piano engine capturing the iconic crystalline electric pianos, bell chimes, barking reeds, and lush ballad stacks of the 1980s. |
+| **Fractal Sound Engine V2** | [`fractalsynths.html`](fractalsynths.html) | [https://atuetete.com/web-synthesizers/unified/fractalsynths.html](Play here) | [**`README-fractal.md`**](README-fractal.md) | Polyphonic synthesizer driven by mathematical fractals, strange attractor chaos theory (Lorenz, Rössler, Chua), optical image resynthesis, and Wolfram 1D cellular automata. |
+| **Physical Modeling String Synthesizer v0.1** | [`stringphysicalmodeling.html`](stringphysicalmodeling.html) | [https://atuetete.com/web-synthesizers/unified/stringphysicalmodeling.html](Play here) | [**`README-stringphysicalmodeling.md`**](README-stringphysicalmodeling.md) | Acoustic string acoustics engine modeling plucked waveguides, tapped/struck hammers, bowed violin stick-slip friction, flageolet nodes, sympathetic arrays, and dispersive stiff wires. |
 
 ---
 
